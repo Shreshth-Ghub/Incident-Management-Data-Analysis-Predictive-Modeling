@@ -273,7 +273,7 @@ This project is part of an educational internship assignment at Triazine Softwar
 
 ## 👨‍💻 Author
 
-**Shreshth Gupta**  
+**Shreshth Gupt**  
 Data Analysis Intern - Triazine Software Pvt. Ltd. / PrimeEHS  
 GitHub: [@Shreshth-Ghub](https://github.com/Shreshth-Ghub)
 
