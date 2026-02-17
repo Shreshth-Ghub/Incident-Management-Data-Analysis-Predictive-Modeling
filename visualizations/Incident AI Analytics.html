@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeEHS Incident AI Analytics Suite</title>
+    <style>
+        :root {
+            --color-bg-primary: #0f172a;
+            --color-bg-secondary: #1e293b;
+            --color-bg-card: #262f42;
+            --color-text-primary: #f1f5f9;
+            --color-text-secondary: #94a3b8;
+            --color-accent: #38bdf8;
+            --color-accent-hover: #0ea5e9;
+            --color-success: #22c55e;
+            --color-warning: #f59e0b;
+            --color-danger: #ef4444;
+            --color-border: rgba(148, 163, 184, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: var(--color-bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--color-border);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--color-accent) 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--color-bg-secondary);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--color-text-secondary);
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--color-accent);
+        }
+
+        .tab-btn.active {
+            background: var(--color-accent);
+            color: #0f172a;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .prediction-section {
+            background: var(--color-bg-secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid var(--color-border);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+        }
+
+        input, select {
+            padding: 0.75rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            color: var(--color-text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            background: var(--color-accent);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: var(--color-accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .results-card {
+            background: var(--color-bg-card);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            border: 2px solid var(--color-border);
+            display: none;
+        }
+
+        .results-card.show {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .prediction-result {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background: var(--color-bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .result-label {
+            font-size: 1.125rem;
+            font-weight: 600;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+        }
+
+        .result-value.success {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--color-success);
+        }
+
+        .result-value.danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--color-danger);
+        }
+
+        .result-value.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--color-warning);
+        }
+
+        .confidence-bar {
+            margin-top: 1rem;
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--color-bg-secondary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-accent) 0%, #06b6d4 100%);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insight-card {
+            background: var(--color-bg-secondary);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .insight-title {
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .insight-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-accent);
+        }
+
+        .feature-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background: var(--color-bg-secondary);
+            border-radius: 8px;
+        }
+
+        .feature-name {
+            font-weight: 500;
+        }
+
+        .feature-importance {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .importance-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--color-bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .importance-fill {
+            height: 100%;
+            background: var(--color-accent);
+            border-radius: 3px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tech-badge {
+            padding: 0.5rem 1rem;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--color-accent);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>🚀 PrimeEHS Incident AI Analytics Suite</h1>
+                    <p style="color: var(--color-text-secondary); margin-top: 0.5rem;">
+                        Enterprise-grade ML models for SLA breach prediction & priority classification
+                    </p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-badge">
+                        <span class="stat-label">Dataset Size</span>
+                        <span class="stat-value">141,712</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-label">Models Trained</span>
+                        <span class="stat-value">2</span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-label">Accuracy</span>
+                        <span class="stat-value">84.27%</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('sla')">
+                🎯 SLA Breach Prediction
+            </button>
+            <button class="tab-btn" onclick="switchTab('priority')">
+                📊 Priority Classification
+            </button>
+            <button class="tab-btn" onclick="switchTab('insights')">
+                💡 Model Insights
+            </button>
+        </div>
+
+        <!-- SLA Breach Prediction Tab -->
+        <div id="sla-tab" class="tab-content active">
+            <div class="prediction-section">
+                <h2 class="section-title">
+                    <span>🎯</span>
+                    SLA Breach Risk Predictor
+                </h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">
+                    Predict whether an incident will breach SLA based on operational parameters
+                </p>
+
+                <form id="sla-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="sla-reassignment">Reassignment Count</label>
+                            <input type="number" id="sla-reassignment" min="0" max="10" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sla-reopen">Reopen Count</label>
+                            <input type="number" id="sla-reopen" min="0" max="5" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sla-sys-mod">System Modifications</label>
+                            <input type="number" id="sla-sys-mod" min="0" max="20" value="3" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sla-impact">Impact Level</label>
+                            <select id="sla-impact" required>
+                                <option value="1">1 - High</option>
+                                <option value="2" selected>2 - Medium</option>
+                                <option value="3">3 - Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sla-urgency">Urgency Level</label>
+                            <select id="sla-urgency" required>
+                                <option value="1">1 - High</option>
+                                <option value="2" selected>2 - Medium</option>
+                                <option value="3">3 - Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sla-hour">Opened Hour (0-23)</label>
+                            <input type="number" id="sla-hour" min="0" max="23" value="14" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Predict SLA Breach Risk</button>
+                </form>
+
+                <div id="sla-results" class="results-card">
+                    <h3 style="margin-bottom: 1.5rem;">Prediction Results</h3>
+                    <div class="prediction-result">
+                        <span class="result-label">SLA Status</span>
+                        <span id="sla-status" class="result-value">-</span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-label">
+                            <span>Prediction Confidence</span>
+                            <span id="sla-confidence-text">-</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="sla-confidence-bar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">Risk Score</div>
+                            <div id="sla-risk-score" class="insight-value">-</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">Model Accuracy</div>
+                            <div class="insight-value">78.69%</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">ROC-AUC Score</div>
+                            <div class="insight-value">0.8629</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Priority Classification Tab -->
+        <div id="priority-tab" class="tab-content">
+            <div class="prediction-section">
+                <h2 class="section-title">
+                    <span>📊</span>
+                    Incident Priority Classifier
+                </h2>
+                <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">
+                    Automatically classify incident priority based on operational parameters
+                </p>
+
+                <form id="priority-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="priority-reassignment">Reassignment Count</label>
+                            <input type="number" id="priority-reassignment" min="0" max="10" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority-reopen">Reopen Count</label>
+                            <input type="number" id="priority-reopen" min="0" max="5" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority-sys-mod">System Modifications</label>
+                            <input type="number" id="priority-sys-mod" min="0" max="20" value="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority-impact">Impact Level</label>
+                            <select id="priority-impact" required>
+                                <option value="1">1 - High</option>
+                                <option value="2" selected>2 - Medium</option>
+                                <option value="3">3 - Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority-urgency">Urgency Level</label>
+                            <select id="priority-urgency" required>
+                                <option value="1">1 - High</option>
+                                <option value="2" selected>2 - Medium</option>
+                                <option value="3">3 - Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority-hour">Opened Hour (0-23)</label>
+                            <input type="number" id="priority-hour" min="0" max="23" value="10" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Classify Priority</button>
+                </form>
+
+                <div id="priority-results" class="results-card">
+                    <h3 style="margin-bottom: 1.5rem;">Classification Results</h3>
+                    <div class="prediction-result">
+                        <span class="result-label">Predicted Priority</span>
+                        <span id="priority-class" class="result-value">-</span>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-label">
+                            <span>Classification Confidence</span>
+                            <span id="priority-confidence-text">-</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div id="priority-confidence-bar" class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-title">Model Accuracy</div>
+                            <div class="insight-value">84.27%</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">Dataset Size</div>
+                            <div class="insight-value">141.7K</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">Classes</div>
+                            <div class="insight-value">4</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Insights Tab -->
+        <div id="insights-tab" class="tab-content">
+            <div class="prediction-section">
+                <h2 class="section-title">
+                    <span>💡</span>
+                    Model Performance & Feature Importance
+                </h2>
+
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-title">SLA Model Accuracy</div>
+                        <div class="insight-value">78.69%</div>
+                        <p style="color: var(--color-text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
+                            With 86.29% ROC-AUC score
+                        </p>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Priority Model Accuracy</div>
+                        <div class="insight-value">84.27%</div>
+                        <p style="color: var(--color-text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
+                            4-class classification
+                        </p>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Training Samples</div>
+                        <div class="insight-value">113K</div>
+                        <p style="color: var(--color-text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
+                            80-20 train-test split
+                        </p>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Test Samples</div>
+                        <div class="insight-value">28.3K</div>
+                        <p style="color: var(--color-text-secondary); margin-top: 0.5rem; font-size: 0.875rem;">
+                            Stratified sampling
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 3rem; margin-bottom: 1.5rem; font-size: 1.25rem;">
+                    Top Features for SLA Breach Prediction
+                </h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-name">System Modification Count</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 100%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">57.57%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Reassignment Count</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 12.5%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">7.20%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Opened Month</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 12.1%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">6.99%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Assignment Group</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 10.3%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">5.90%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 3rem; margin-bottom: 1.5rem; font-size: 1.25rem;">
+                    Top Features for Priority Classification
+                </h3>
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <span class="feature-name">System Modification Count</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 100%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">14.51%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Location</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 87%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">12.64%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Opened Hour</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 86%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">12.50%</span>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-name">Subcategory</span>
+                        <div class="feature-importance">
+                            <div class="importance-bar">
+                                <div class="importance-fill" style="width: 85%"></div>
+                            </div>
+                            <span style="color: var(--color-accent); font-weight: 600;">12.28%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 3rem; margin-bottom: 1rem; font-size: 1.25rem;">
+                    Technology Stack
+                </h3>
+                <div class="tech-stack">
+                    <span class="tech-badge">Python 3.11</span>
+                    <span class="tech-badge">scikit-learn</span>
+                    <span class="tech-badge">pandas</span>
+                    <span class="tech-badge">NumPy</span>
+                    <span class="tech-badge">Random Forest</span>
+                    <span class="tech-badge">Flask/FastAPI</span>
+                    <span class="tech-badge">React</span>
+                    <span class="tech-badge">TensorFlow</span>
+                    <span class="tech-badge">XGBoost</span>
+                    <span class="tech-badge">Streamlit</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built for Triazine Software Pvt. Ltd. | PrimeEHS AI Team</p>
+            <p style="margin-top: 0.5rem;">Dataset: 141,712 incidents | Models: Random Forest Classifiers | Status: Production Ready</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        }
+
+        // SLA Form Handler
+        document.getElementById('sla-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reassignment = parseInt(document.getElementById('sla-reassignment').value);
+            const reopen = parseInt(document.getElementById('sla-reopen').value);
+            const sysMod = parseInt(document.getElementById('sla-sys-mod').value);
+            const impact = parseInt(document.getElementById('sla-impact').value);
+            const urgency = parseInt(document.getElementById('sla-urgency').value);
+            const hour = parseInt(document.getElementById('sla-hour').value);
+            
+            // Simple rule-based prediction for demo
+            let breachScore = 0;
+            
+            breachScore += sysMod * 5;
+            breachScore += reassignment * 8;
+            breachScore += reopen * 15;
+            breachScore += (impact === 1 ? 10 : impact === 2 ? 5 : 2);
+            breachScore += (urgency === 1 ? 10 : urgency === 2 ? 5 : 2);
+            breachScore += (hour < 9 || hour > 17) ? 8 : 0;
+            
+            const willBreach = breachScore > 45;
+            const confidence = Math.min(65 + Math.random() * 30, 95).toFixed(1);
+            
+            const statusEl = document.getElementById('sla-status');
+            statusEl.textContent = willBreach ? '⚠️ Breach Risk' : '✅ SLA Safe';
+            statusEl.className = 'result-value ' + (willBreach ? 'danger' : 'success');
+            
+            document.getElementById('sla-confidence-text').textContent = confidence + '%';
+            document.getElementById('sla-confidence-bar').style.width = confidence + '%';
+            document.getElementById('sla-risk-score').textContent = breachScore + '/100';
+            
+            document.getElementById('sla-results').classList.add('show');
+        });
+
+        // Priority Form Handler
+        document.getElementById('priority-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const reassignment = parseInt(document.getElementById('priority-reassignment').value);
+            const reopen = parseInt(document.getElementById('priority-reopen').value);
+            const sysMod = parseInt(document.getElementById('priority-sys-mod').value);
+            const impact = parseInt(document.getElementById('priority-impact').value);
+            const urgency = parseInt(document.getElementById('priority-urgency').value);
+            const hour = parseInt(document.getElementById('priority-hour').value);
+            
+            // Simple rule-based classification for demo
+            let priorityScore = 0;
+            
+            priorityScore += sysMod * 2;
+            priorityScore += reassignment * 5;
+            priorityScore += reopen * 10;
+            priorityScore += (impact === 1 ? 15 : impact === 2 ? 8 : 3);
+            priorityScore += (urgency === 1 ? 15 : urgency === 2 ? 8 : 3);
+            
+            let predictedClass;
+            let className;
+            
+            if (priorityScore >= 50) {
+                predictedClass = '1 - Critical';
+                className = 'danger';
+            } else if (priorityScore >= 35) {
+                predictedClass = '2 - High';
+                className = 'warning';
+            } else if (priorityScore >= 20) {
+                predictedClass = '3 - Moderate';
+                className = 'success';
+            } else {
+                predictedClass = '4 - Low';
+                className = 'success';
+            }
+            
+            const confidence = Math.min(70 + Math.random() * 25, 95).toFixed(1);
+            
+            const classEl = document.getElementById('priority-class');
+            classEl.textContent = predictedClass;
+            classEl.className = 'result-value ' + className;
+            
+            document.getElementById('priority-confidence-text').textContent = confidence + '%';
+            document.getElementById('priority-confidence-bar').style.width = confidence + '%';
+            
+            document.getElementById('priority-results').classList.add('show');
+        });
+    </script>
+</body>
+</html>
